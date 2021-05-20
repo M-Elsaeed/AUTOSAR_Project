@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "schm_port.h": "c",
+        "tm4c123gh6pm_registers.h": "c",
+        "dio.h": "c"
+    }
+}

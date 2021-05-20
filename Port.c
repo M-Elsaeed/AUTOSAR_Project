@@ -16,25 +16,20 @@
 #include "tm4c123gh6pm_registers.h"
 
 
-// #define GPIO_PORTA_BASE_ADDRESS (*((volatile uint32 *)0x40004000))
-#define GPIO_PORTA_BASE_ADDRESS 0x40004000U
-#define GPIO_PORTE_BASE_ADDRESS 0x40004000U
-#define GPIO_PORTF_BASE_ADDRESS 0x40004000U
+volatile static uint8 PORT_Status = 0;
 
-#define PORT_DATA_REG_OFFSET              0x3FC
-#define PORT_DIR_REG_OFFSET               0x400
-#define PORT_ALT_FUNC_REG_OFFSET          0x420
-#define PORT_PULL_UP_REG_OFFSET           0x510
-#define PORT_PULL_DOWN_REG_OFFSET         0x514
-#define PORT_DIGITAL_ENABLE_REG_OFFSET    0x51C
-#define PORT_LOCK_REG_OFFSET              0x520
-#define PORT_COMMIT_REG_OFFSET            0x524
-#define PORT_ANALOG_MODE_SEL_REG_OFFSET   0x528
-#define PORT_CTL_REG_OFFSET               0x52C
-#define MAX_MODE_NUMBER 15
 
-volatile uint8 PORT_Status = 0;
-
+/*
+* Service name: Port_Init
+* Service ID[hex]: 0x00
+* Sync/Async: Synchronous
+* Reentrancy: Non Reentrant
+* Parameters (in): ConfigPtr Pointer to configuration set.
+* Parameters(inout): None
+* Parameters (out): None
+* Return value: None
+* Description: Initializes the Port Driver module.
+*/
 void Port_Init(const Port_ConfigType* ConfigPtr)
 {
 
@@ -135,6 +130,17 @@ void Port_Init(const Port_ConfigType* ConfigPtr)
 
 }
 
+/*
+* Service name: Port_SetPinDirection
+* Service ID[hex]: 0x01
+* Sync/Async: Synchronous
+* Reentrancy: Reentrant
+* Pin Port Pin ID number Parameters (in): Direction Port Pin Direction
+* Parameters (inout): None
+* Parameters (out): None
+* Return value: None
+* Description: Sets the port pin direction
+*/
 void Port_SetPinDirection(Port_PinType Pin, Port_PinDirectionType Direction)
 {
     sint8 index = -1;
@@ -228,6 +234,90 @@ void Port_SetPinDirection(Port_PinType Pin, Port_PinDirectionType Direction)
     }
 }
 
+/*
+* Service name: Port_RefreshPortDirection
+* Service ID[hex]: 0x02
+* Sync/Async: Synchronous
+* Reentrancy: Non Reentrant
+* Parameters (in): None
+* Parameters (inout): None
+* Parameters (out): None
+* Return value: None
+* Description: Refreshes port direction.
+*/
+void Port_RefreshPortDirection(void)
+{
+#if (PORT_DEV_ERROR_DETECT == STD_ON)
+    if (PORT_NOT_INITIALIZED == PORT_Status)
+    {
+        Det_ReportError(PORT_MODULE_ID, PORT_INSTANCE_ID,
+            Port_RefreshPortDirection_SID, PORT_E_UNINIT);
+        // error = TRUE;
+    }
+    else
+    {
+        /* No Action Required */
+    }
+
+#endif
+    for (uint8 i = 0; i < PORT_CONFIGURED_PORTPINS; i++)
+    {
+        Port_SetPinDirection(Port_Configuration[i].pinId, Port_Configuration[i].pinDirection);
+    }
+}
+
+
+/*
+* Service name: Port_GetVersionInfo
+* Service ID[hex]: 0x03
+* Sync/Async: Synchronous
+* Reentrancy: Non Reentrant
+* Parameters (in): None
+* Parameters (inout): None
+* Parameters (out): versioninfo Pointer to where to store the version information of this module.
+* Return value: None
+* Description: Returns the version information of this module.
+*/
+void Port_GetVersionInfo(Std_VersionInfoType* versioninfo)
+{
+#if (PORT_DEV_ERROR_DETECT == STD_ON)
+    if (PORT_NOT_INITIALIZED == PORT_Status)
+    {
+        Det_ReportError(PORT_MODULE_ID, PORT_INSTANCE_ID,
+            Port_GetVersionInfo_SID, PORT_E_UNINIT);
+        // error = TRUE;
+    }
+    else
+    {
+        /* No Action Required */
+    }
+    /* check if the input configuration pointer is not a NULL_PTR */
+    if (NULL_PTR == versioninfo)
+    {
+        Det_ReportError(PORT_MODULE_ID, PORT_INSTANCE_ID, Port_GetVersionInfo_SID,
+            PORT_E_PARAM_POINTER);
+    }
+
+#endif
+    versioninfo->vendorID = PORT_VENDOR_ID;
+    versioninfo->moduleID = PORT_MODULE_ID;
+    versioninfo->sw_major_version = PORT_SW_MAJOR_VERSION;
+    versioninfo->sw_minor_version = PORT_SW_MINOR_VERSION;
+    versioninfo->sw_patch_version = PORT_SW_PATCH_VERSION;
+}
+
+
+/*
+* Service name: Port_SetPinMode
+* Service ID[hex]: 0x04
+* Sync/Async: Synchronous
+* Reentrancy: Reentrant
+* Pin Port Pin ID number Parameters (in): Mode New Port Pin mode to be set on port pin.
+* Parameters (inout): None
+* Parameters (out): None
+* Return value: None
+* Description: Sets the port pin mode
+*/
 void Port_SetPinMode(Port_PinType Pin, Port_PinModeType Mode)
 {
     sint8 index = -1;
@@ -302,51 +392,3 @@ void Port_SetPinMode(Port_PinType Pin, Port_PinModeType Mode)
     *(volatile uint32*)((volatile uint8*)baseRegAddr + PORT_CTL_REG_OFFSET) |= (Mode << ((ConfigPtr->pinId % 8) * 4));        /* set the PMCx bits for this pin with the desired mode */
 }
 
-void Port_GetVersionInfo(Std_VersionInfoType* versioninfo)
-{
-#if (PORT_DEV_ERROR_DETECT == STD_ON)
-    if (PORT_NOT_INITIALIZED == PORT_Status)
-    {
-        Det_ReportError(PORT_MODULE_ID, PORT_INSTANCE_ID,
-            Port_GetVersionInfo_SID, PORT_E_UNINIT);
-        // error = TRUE;
-    }
-    else
-    {
-        /* No Action Required */
-    }
-    /* check if the input configuration pointer is not a NULL_PTR */
-    if (NULL_PTR == versioninfo)
-    {
-        Det_ReportError(PORT_MODULE_ID, PORT_INSTANCE_ID, Port_GetVersionInfo_SID,
-            PORT_E_PARAM_POINTER);
-    }
-
-#endif
-    versioninfo->vendorID = PORT_VENDOR_ID;
-    versioninfo->moduleID = PORT_MODULE_ID;
-    versioninfo->sw_major_version = PORT_SW_MAJOR_VERSION;
-    versioninfo->sw_minor_version = PORT_SW_MINOR_VERSION;
-    versioninfo->sw_patch_version = PORT_SW_PATCH_VERSION;
-}
-
-void Port_RefreshPortDirection(void)
-{
-#if (PORT_DEV_ERROR_DETECT == STD_ON)
-    if (PORT_NOT_INITIALIZED == PORT_Status)
-    {
-        Det_ReportError(PORT_MODULE_ID, PORT_INSTANCE_ID,
-            Port_RefreshPortDirection_SID, PORT_E_UNINIT);
-        // error = TRUE;
-    }
-    else
-    {
-        /* No Action Required */
-    }
-
-#endif
-    for (uint8 i = 0; i < PORT_CONFIGURED_PORTPINS; i++)
-    {
-        Port_SetPinDirection(Port_Configuration[i].pinId, Port_Configuration[i].pinDirection);
-    }
-}

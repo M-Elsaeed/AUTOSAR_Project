@@ -74,7 +74,7 @@
 #error "The SW version of Port_Cfg.h does not match the expected version"
 #endif
 
-/***********************[Module Type Definitions]***********************/
+// Module Type Definitions
 
 
 typedef uint8 Port_PinModeType;
@@ -98,9 +98,9 @@ typedef struct {
   Port_InternalResistorType pinInternalResistor;
 } Port_ConfigType;
 
-extern const Port_ConfigType Port_Configuration[]; 
+extern const Port_ConfigType Port_Configuration[];
 
-/***********************[SID]***********************/
+// SID
 
 #define Port_Init_SID 0x00
 #define Port_SetPinDirection_SID 0x01
@@ -108,9 +108,9 @@ extern const Port_ConfigType Port_Configuration[];
 #define Port_GetVersionInfo_SID 0x03
 #define Port_SetPinMode_SID 0x04
 
-/***********************[Function Prototypes]***********************/
+// Function Prototypes
 
-void Port_Init(const Port_ConfigType* ConfigPtr);
+void Port_Init(const Port_ConfigType * ConfigPtr);
 
 
 #if PORT_SET_PIN_DIRECTION_API == STD_ON
@@ -128,7 +128,7 @@ void Port_RefreshPortDirection(
 
 #if  PORT_VERSION_INFO_API == STD_ON
 void Port_GetVersionInfo(
-  Std_VersionInfoType* versioninfo
+  Std_VersionInfoType * versioninfo
 );
 #endif
 
@@ -140,7 +140,7 @@ void Port_SetPinMode(
 );
 #endif
 
-/***********************[ERROR CODES]***********************/
+// ERROR CODES
 
 #define PORT_E_PARAM_PIN 0x0A
 #define PORT_E_DIRECTION_UNCHANGEABLE 0x0B
@@ -151,8 +151,9 @@ void Port_SetPinMode(
 #define PORT_E_PARAM_POINTER 0x10
 
 
-/***********************[PIN MODES]***********************/
+// PIN MODES
 
+#define MAX_MODE_NUMBER 15
 #define  PORT_PIN_MODE_ADC  (0U)
 #define  PORT_PIN_MODE_DIO  (10U)
 #define  PORT_PIN_NOT_ACTIVE  (9U)
@@ -168,14 +169,30 @@ void Port_SetPinMode(
 #define  PORT_PIN_MODE_CAN  (8U)
 #define  PORT_PIN_MODE_USB  (8U)
 
-/***********************[PIN LEVELS]***********************/
+// PIN LEVELS
 
 #define PORT_PIN_LEVEL_HIGH STD_ACTIVE
 #define PORT_PIN_LEVEL_LOW STD_IDLE
 
-/***********************[Extern Configuration Struct]***********************/
+// GPIO Registers Base Adresses
+#define GPIO_PORTA_BASE_ADDRESS 0x40004000U
+#define GPIO_PORTE_BASE_ADDRESS 0x40004000U
+#define GPIO_PORTF_BASE_ADDRESS 0x40004000U
 
-// extern const Port_ConfigType Port_Configuration[]; 
+// Registers Offsets
+
+#define PORT_DATA_REG_OFFSET              0x3FC
+#define PORT_DIR_REG_OFFSET               0x400
+#define PORT_ALT_FUNC_REG_OFFSET          0x420
+#define PORT_PULL_UP_REG_OFFSET           0x510
+#define PORT_PULL_DOWN_REG_OFFSET         0x514
+#define PORT_DIGITAL_ENABLE_REG_OFFSET    0x51C
+#define PORT_LOCK_REG_OFFSET              0x520
+#define PORT_COMMIT_REG_OFFSET            0x524
+#define PORT_ANALOG_MODE_SEL_REG_OFFSET   0x528
+#define PORT_CTL_REG_OFFSET               0x52C
+
+extern const Port_ConfigType Port_Configuration[]; 
 
 
 #endif /* PORT_H */

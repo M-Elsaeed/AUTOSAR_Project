@@ -26,13 +26,13 @@
 #define PORT_CFG_AR_RELEASE_MINOR_VERSION     (0U)
 #define PORT_CFG_AR_RELEASE_PATCH_VERSION     (3U)
 
-
+// Port Driver Pre-processor switch to enable / disable the use of the functions and DEV errors detection
 #define PORT_DEV_ERROR_DETECT (STD_ON)
 #define PORT_VERSION_INFO_API (STD_ON)
 #define PORT_SET_PIN_DIRECTION_API (STD_ON)
 #define PORT_SET_PIN_MODE_API (STD_ON)
 
-  // Number of configured PINS
+// Number of configured PINS
 #define PORT_CONFIGURED_PORTPINS (2U)
 
 // Configs for LED1
