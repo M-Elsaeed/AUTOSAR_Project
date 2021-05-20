@@ -14,12 +14,10 @@
 #include "Led.h"
 #include "Dio.h"
 
+
 /* Description: Task executes once to initialize all the Modules */
 void Init_Task(void)
 {
-    /* Initialize Dio Driver */
-    Dio_Init(&Dio_Configuration);
-
     /* Initialize LED Driver */
     LED_init();
 	
